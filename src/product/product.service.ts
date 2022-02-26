@@ -7,40 +7,35 @@ import { CreateProductDTO } from './dto/product.dto';
 @Injectable()
 export class ProductService {
 
-    constructor(@InjectModel('Product') private readonly productModel: Model<Product>){
-
-    }
+    constructor(@InjectModel('Product') private readonly productModel: Model<Product>){}
 
         async getProducts(): Promise<Product[]>{
-           const products =  await this.productModel.find();
-            return products;
 
+            const products =  await this.productModel.find();
+            return products;
         }
 
-       async  getProduct(productID: string): Promise<Product>{
+       async getProduct(productID: string): Promise<Product>{
+
             const product =  await this.productModel.findById(productID);
             return product;
-
         }
 
         async createProduct(createProductDTO: CreateProductDTO): Promise<Product>{
+
             const newProduct = new this.productModel(createProductDTO);
             return await newProduct.save();        
         }
     
         async updateProduct(productID: string, createProductDTO: CreateProductDTO): Promise<Product>{
-            const updatedProduct = await this.productModel.findByIdAndUpdate(productID, 
-                createProductDTO, { new: true} )
 
+            const updatedProduct = await this.productModel.findByIdAndUpdate(productID, createProductDTO, { new: true} )
             return updatedProduct;
-            
         }
 
         async deleteProduct(productID: string): Promise<Product>{
+
             const deletedProduct = await this.productModel.findByIdAndDelete(productID)
             return deletedProduct;
-            
         }
-
-    
 }

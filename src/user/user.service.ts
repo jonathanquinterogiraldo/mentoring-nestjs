@@ -1,30 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { CreateUserDTO } from './dto/user.dto';
+import * as bcrypt from 'bcrypt'
+
 
 @Injectable()
 export class UserService {
 
-    constructor(@InjectRepository(User) private userModel: Repository<User>){}
+    constructor(
+        @InjectRepository(User) private userModel: Repository<User>
+        ){}
 
     async getUsers(): Promise<User[]>{
 
-        const users =  await this.userModel.find();
-        return users;
-     }
+        return await this.userModel.find();
+    }
 
     async getUser(id: string): Promise<User>{
 
-         const user = await this.userModel.findOne(id);
-         return user;
+        return await this.userModel.findOne(id);    
      }
 
-     async createUser(createUserDTO: CreateUserDTO): Promise<User>{
+     async getUserByEmail(email: string): Promise<User | undefined> {
 
-         const newUser = await this.userModel.create(createUserDTO);        
-         return await this.userModel.save(newUser);        
+        return await this.userModel.findOne({ email });
+     }
+
+     async createUser(createUserDTO: CreateUserDTO): Promise<User>{   
+
+        const { password, ...restData } = createUserDTO        
+        
+            try {
+
+                const salt = await bcrypt.genSalt();
+                const encriptedPassword = await bcrypt.hash(password, salt);   
+                const newUser = {...restData, password: encriptedPassword };
+                    
+                return await this.userModel.save(newUser);
+
+            } catch (error) {
+                throw new Error(error)                
+            }
      }
 
      async updateUser(id: number, createUserDTO: CreateUserDTO){

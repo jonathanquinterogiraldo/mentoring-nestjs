@@ -6,12 +6,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from './user/orm.config';
+import { AuthModule } from './auth/auth.module';
+require('dotenv').config()
 
 @Module({
   imports: [ProductModule,
-    MongooseModule.forRoot('mongodb+srv://jonathanqg:Aa123456*@cluster0.6wmbu.mongodb.net/nestjs-inventory'),
+    MongooseModule.forRoot(process.env.CONNECTION_MONGODB),
     TypeOrmModule.forRoot(config),
-    UserModule],
+    UserModule,
+    AuthModule,  
+    ],
   controllers: [AppController],
   providers: [AppService],
 })

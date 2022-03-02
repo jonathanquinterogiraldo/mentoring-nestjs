@@ -41,14 +41,28 @@ export class UserController {
     }
 
      @Post('/create')
-     async createUser(@Res() res, @Body() createUserDto: CreateUserDTO): Promise<User>{         
-         
-        const user = await this.userService.createUser(createUserDto);    
-        return res.status(HttpStatus.OK).json({
-            message: 'User created!',
-            user
-        })
-    }   
+     async createUser(@Res() res, @Body() createUserDto: CreateUserDTO): Promise<Response>{         
+        
+        const { email } = createUserDto;        
+        
+        const userExist = await this.userService.getUserByEmail(email)  
+               
+        if (!userExist){
+                
+            const user = await this.userService.createUser(createUserDto);
+            return res.status(HttpStatus.OK).json({
+                    message: 'User created!',
+                    user
+                })
+        }
+        else {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: 'User already exist!'
+            })
+        }
+        
+    }
+     
 
     @Put('/update')
      async updateUser(@Res() res, @Body() createUserDto: CreateUserDTO, @Query('id') id): Promise<User>{

@@ -1,12 +1,14 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+require('dotenv').config()
 
 export const config: TypeOrmModuleOptions = {
     type: 'postgres',
-    username: 'pttrxdqu',
-    password: 'PyhERrwjnP8r9bLBzkDnUfyfmOww8_o-',
-    port: 5432,
-    host: 'kashin.db.elephantsql.com',
-    database: 'pttrxdqu',
+    username: process.env.POSTGRES_USERNAME,
+    password: process.env.POSTGRES_PASSWORD,
+    port: parseInt(process.env.POSTGRES_PORT),
+    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DATABASE,
     synchronize: true,
     entities: ['dist/**/*.entity{.ts,.js}']
 }
+

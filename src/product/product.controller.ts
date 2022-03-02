@@ -14,12 +14,15 @@ import {
 import { CreateProductDTO } from './dto/product.dto';
 import { Product } from './interfaces/product.interface';
 import { ProductService } from './product.service';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('product')
 export class ProductController {
 
     constructor(private productService: ProductService){}
 
+    @UseGuards(JwtAuthGuard)
     @Get('/')
     async getProducts(@Res() res): Promise<Product[]>{
 
@@ -30,6 +33,7 @@ export class ProductController {
         })
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('/:productID')
     async getProduct(@Res() res, @Param('productID') productID): Promise<Product[]>{
 
@@ -40,6 +44,7 @@ export class ProductController {
         return res.status(HttpStatus.OK).json(product);
     }
     
+    @UseGuards(JwtAuthGuard)
     @Post('/create')
     async createProduct(@Res() res, @Body() createProductProductDto: CreateProductDTO): Promise<Product>{
 
@@ -50,6 +55,7 @@ export class ProductController {
         })
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put('/update')
     async updateProduct(@Res() res, @Body() createProductDTO: CreateProductDTO, @Query('productID') productID): Promise<Product> {
 
@@ -64,6 +70,7 @@ export class ProductController {
 
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/delete')
     async deleteProduct(@Res() res, @Query('productID') productID) {
         const deletedProduct = await this.productService.deleteProduct(productID);

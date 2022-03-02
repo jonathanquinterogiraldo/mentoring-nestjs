@@ -9,17 +9,21 @@ import {
     Body,
     Param,
     NotFoundException,
-    Query 
+    Query, 
+    ParseIntPipe
 } from '@nestjs/common';
 import { User } from './interfaces/user.interace';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/user.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
    
     constructor(private userService: UserService){}
 
+    @UseGuards(JwtAuthGuard)
     @Get('/')
     async getUsers(@Res() res): Promise<User[]>{
 
@@ -30,8 +34,9 @@ export class UserController {
         })
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('/:id')
-    async getUser(@Res() res, @Param('id') id: string): Promise<User>{ 
+    async getUser(@Res() res, @Param('id', ParseIntPipe) id: number): Promise<User>{ 
 
         const user =  await this.userService.getUser(id);
         if (!user){
@@ -40,30 +45,40 @@ export class UserController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-     @Post('/create')
+    @UseGuards(JwtAuthGuard)
+    @Post('/create')
      async createUser(@Res() res, @Body() createUserDto: CreateUserDTO): Promise<Response>{         
         
         const { email } = createUserDto;        
         
         const userExist = await this.userService.getUserByEmail(email)  
-               
-        if (!userExist){
+
+        try {
+
+            if (!userExist){
                 
-            const user = await this.userService.createUser(createUserDto);
-            return res.status(HttpStatus.OK).json({
-                    message: 'User created!',
-                    user
+                const user = await this.userService.createUser(createUserDto);
+                return res.status(HttpStatus.OK).json({
+                        message: 'User created!',
+                        user
+                    })
+            }
+            else {
+                return res.status(HttpStatus.BAD_REQUEST).json({
+                    message: 'User already exist!'
                 })
+            }
+
+        } catch (error) {
+            throw new Error(error)
+
         }
-        else {
-            return res.status(HttpStatus.BAD_REQUEST).json({
-                message: 'User already exist!'
-            })
-        }
+               
+        
         
     }
      
-
+    @UseGuards(JwtAuthGuard)
     @Put('/update')
      async updateUser(@Res() res, @Body() createUserDto: CreateUserDTO, @Query('id') id): Promise<User>{
 
@@ -78,6 +93,7 @@ export class UserController {
 
     }
 
+   @UseGuards(JwtAuthGuard)
    @Delete('/delete')
     async deleteUser(@Res() res, @Query('id') id): Promise<User>{
 

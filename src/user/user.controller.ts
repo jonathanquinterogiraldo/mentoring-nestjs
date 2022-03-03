@@ -17,6 +17,7 @@ import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/user.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RoleGuard } from 'src/auth/guards/role.guard';
 
 @Controller('user')
 export class UserController {
@@ -78,7 +79,7 @@ export class UserController {
         
     }
      
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard)
     @Put('/update')
      async updateUser(@Res() res, @Body() createUserDto: CreateUserDTO, @Query('id') id): Promise<User>{
 
@@ -93,7 +94,7 @@ export class UserController {
 
     }
 
-   @UseGuards(JwtAuthGuard)
+   @UseGuards(JwtAuthGuard, RoleGuard)
    @Delete('/delete')
     async deleteUser(@Res() res, @Query('id') id): Promise<User>{
 

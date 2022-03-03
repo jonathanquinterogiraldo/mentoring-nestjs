@@ -8,6 +8,8 @@ export class CreateUserDTO {
     @MaxLength(50)
     readonly name: string;
 
+    @IsString()
+    @MinLength(3)
     @MaxLength(100)
     readonly lastname: string;
 

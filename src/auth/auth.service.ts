@@ -29,8 +29,6 @@ export class AuthService {
 
             throw new Error(error)
         }
-
-        
     }
 
     login(user: User): { access_token: string } {
@@ -52,7 +50,7 @@ export class AuthService {
         const user = await this.userService.getUserByEmail(decoded.email)
 
         if(!user){
-            
+
             throw new Error('Unable to get the user from decoded token')
         }
 

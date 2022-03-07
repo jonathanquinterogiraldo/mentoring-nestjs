@@ -10,21 +10,24 @@ import {
     Param,
     NotFoundException,
     Query, 
-    ParseIntPipe
+    ParseIntPipe,    
+    Logger
 } from '@nestjs/common';
 import { User } from './interfaces/user.interace';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/user.dto';
-import { UseGuards, Logger, Req } from '@nestjs/common';
+import { UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/auth/guards/role.guard';
 
+
 @Controller('user')
-export class UserController {
-    
-    private logger = new Logger('UserController')
+export class UserController {   
    
-    constructor(private userService: UserService){}
+    constructor(      
+    private userService: UserService,
+    private readonly logger: Logger,    
+    ){}
 
     @Get('/')
     @UseGuards(JwtAuthGuard)    
@@ -33,7 +36,9 @@ export class UserController {
         const users = await this.userService.getUsers()
 
         if (users){
-            this.logger.verbose(`Get request ('/') User ${req.user.email} retrieving all users`)
+            this.logger.log(
+                `Get request ('/') User ${req.user.email} retrieving all users`,
+                 UserController.name);
             return res.status(HttpStatus.OK).json({
             message: 'All users!',
             users
@@ -53,7 +58,10 @@ export class UserController {
         if (!user){
             throw new NotFoundException('This user does not exist!')
         }
-        this.logger.verbose(`Get request ('/${id}') User ${req.user.email} retrieving one especific user`)
+        this.logger.log(
+            `Get request ('/${id}') User ${req.user.email} retrieving one especific user`,
+             UserController.name);
+       
         return res.status(HttpStatus.OK).json(user);
     }
 
@@ -68,7 +76,10 @@ export class UserController {
         if (!userExist){
             
             const user = await this.userService.createUser(createUserDto);
-            this.logger.verbose(`Post request ('/create') User ${req.user.email} creating a user`)
+            this.logger.log(
+                `Post request ('/create') User ${req.user.email} creating a user`,
+                 UserController.name);
+           
             return res.status(HttpStatus.OK).json({
                     message: 'User created!',
                     user
@@ -79,8 +90,6 @@ export class UserController {
                 message: 'User already exist!'
             })
         }
-
-        
     }
      
     @UseGuards(JwtAuthGuard, RoleGuard)
@@ -90,8 +99,8 @@ export class UserController {
         const updatedUser = await this.userService.updateUser(id, createUserDto);           
         if (!updatedUser){
             throw new NotFoundException('This user does not exist')
-        }
-        this.logger.verbose(`Put request ('/update') User ${req.user.email} updating a user`)
+        }        
+        
         return res.status(HttpStatus.OK).json({
             message: 'User updated succefully',
             updatedUser
@@ -107,7 +116,10 @@ export class UserController {
         if (!deletedUser){
             throw new NotFoundException('This user does not exist')
         }
-        this.logger.verbose(`Delete request ('/delete') User ${req.user.email} deleting a user`)
+        this.logger.log(
+            `Delete request ('/delete') User ${req.user.email} deleting a user`,
+             UserController.name);
+        
         return res.status(HttpStatus.OK).json({
             message: 'User deleted succefully!',
             deletedUser

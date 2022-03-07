@@ -18,18 +18,22 @@ import { UseGuards, Logger, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('product')
-export class ProductController {
+export class ProductController {    
 
-    private logger = new Logger('ProductController')
-
-    constructor(private productService: ProductService){}
+    constructor(
+        private productService: ProductService,
+        private readonly logger: Logger,
+        ){}
 
     @UseGuards(JwtAuthGuard)
     @Get('/')
     async getProducts(@Req() req, @Res() res): Promise<Product[]>{
 
         const products = await this.productService.getProducts()
-        this.logger.verbose(`Get request ('/') User ${req.user.email} retrieving all products`)
+        this.logger.log(
+            `Get request ('/') User ${req.user.email} retrieving all products`,
+            ProductController.name);
+        
         return res.status(HttpStatus.OK).json({
             message: 'All products',
             products
@@ -44,7 +48,10 @@ export class ProductController {
         if (!product){
             throw new NotFoundException('This product does not exist')
         }
-        this.logger.verbose(`Get request ('/${productID}') User ${req.user.email} retrieving one product`)
+        this.logger.log(
+            `Get request ('/${productID}') User ${req.user.email} retrieving one product`,
+            ProductController.name);
+        
         return res.status(HttpStatus.OK).json(product);
     }
     
@@ -53,7 +60,10 @@ export class ProductController {
     async createProduct(@Req() req, @Res() res, @Body() createProductProductDto: CreateProductDTO): Promise<Product>{
 
         const product = await this.productService.createProduct(createProductProductDto)
-        this.logger.verbose(`Post request ('/create') User ${req.user.email} creating a product`)
+        this.logger.log(
+            `Post request ('/create') User ${req.user.email} creating a product`,
+            ProductController.name);
+        
         return res.status(HttpStatus.OK).json({
             message: 'received',
             product
@@ -68,7 +78,10 @@ export class ProductController {
         if (!updatedProduct){
             throw new NotFoundException('This product does not exist')
         }
-        this.logger.verbose(`Put request ('/update') User ${req.user.email} updating a product`)
+        this.logger.log(
+            `Put request ('/update') User ${req.user.email} updating a product`,
+            ProductController.name);
+        
         return res.status(HttpStatus.OK).json({
             message: 'product updated succefully',
             updatedProduct
@@ -83,7 +96,10 @@ export class ProductController {
         if (!deletedProduct){
             throw new NotFoundException('This product does not exist')
         }
-        this.logger.verbose(`Delete request ('/delete') User ${req.user.email} deleting a product`)
+        this.logger.log(
+            `Delete request ('/delete') User ${req.user.email} deleting a product`,
+            ProductController.name);
+        
         return res.status(HttpStatus.OK).json({
             message: 'product deleted succefully!',
             deletedProduct

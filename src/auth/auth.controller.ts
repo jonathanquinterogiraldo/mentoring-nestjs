@@ -5,19 +5,20 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
-export class AuthController {
-
-    private logger = new Logger('AuthController')
+export class AuthController {    
 
     constructor(
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly logger: Logger
     ){}
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
     login(@Req() req: Request): { access_token: string} {
+        this.logger.log(
+            `The user ${req.body.email} has been logged`,
+            AuthService.name);
 
-        this.logger.verbose(`The user ${req.body.email} has been logged`)
         return this.authService.login(req.user as User)
     }
 }

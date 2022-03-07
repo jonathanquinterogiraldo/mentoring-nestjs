@@ -18,7 +18,7 @@ import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/user.dto';
 import { UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RoleGuard } from 'src/auth/guards/role.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
 
 
 @Controller('user')
@@ -65,8 +65,8 @@ export class UserController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post('/create')
+    @UseGuards(JwtAuthGuard)    
      async createUser(@Req() req, @Res() res, @Body() createUserDto: CreateUserDTO): Promise<Response>{         
         
         const { email } = createUserDto;        
@@ -92,8 +92,8 @@ export class UserController {
         }
     }
      
-    @UseGuards(JwtAuthGuard, RoleGuard)
     @Put('/update')
+    @UseGuards(JwtAuthGuard, RoleGuard)    
      async updateUser(@Req() req, @Res() res, @Body() createUserDto: CreateUserDTO, @Query('id') id): Promise<User>{
 
         const updatedUser = await this.userService.updateUser(id, createUserDto);           
@@ -108,8 +108,8 @@ export class UserController {
 
     }
 
-   @UseGuards(JwtAuthGuard, RoleGuard)
-   @Delete('/delete')
+    @Delete('/delete')
+    @UseGuards(JwtAuthGuard, RoleGuard)   
     async deleteUser(@Req() req, @Res() res, @Query('id') id): Promise<User>{
 
         const deletedUser =  await this.userService.deleteUser(id);
